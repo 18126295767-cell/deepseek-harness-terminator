@@ -1,0 +1,56 @@
+DeepSeek Harness Terminator
+Copyright (c) 2026 DeepSeek Harness Terminator contributors
+
+This repository contains an independent native macOS shell for the open-source
+DeepSeek Harness project by DeepSeek AI:
+https://github.com/deepseek-ai/deepseek-harness
+
+The app shell is not affiliated with, sponsored by, endorsed by, or an official
+product of DeepSeek AI. "DeepSeek" and "DeepSeek Harness" are used only to
+identify the upstream compatibility target and may be trademarks of their
+respective owners.
+
+The upstream DeepSeek Harness project is MIT-licensed. The upstream project
+and its own notices remain authoritative for the bundled DSH runtime; this
+repository does not redistribute npm dependencies, API keys, plugins, user
+data, logs, or private configuration.
+
+## Third-party notice: WebKit (browser engine)
+
+The built-in browser panel and the main Harness window are rendered with
+Apple's WebKit through the system `WebKit` framework (`WKWebView`). WebKit is
+the open-source browser engine (https://webkit.org) that Apple ships as part of
+macOS. This application uses the framework provided by the operating system and
+does not redistribute its source code or binaries; see the corresponding Apple
+macOS license for the exact terms of your WebKit installation.
+
+WebKit is distributed by Apple under a dual license:
+- Apple's BSD-2-Clause ("Simplified BSD") license, and
+- the GNU Lesser General Public License, version 2.1 (LGPL-2.1).
+
+The BSD-2-Clause license text (Apple) reads, in part:
+"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY APPLE INC. "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+
+The full BSD-2-Clause and LGPL-2.1 texts are available in the WebKit source
+repository (https://github.com/WebKit/WebKit) and in the LICENSE files shipped
+with Apple's WebKit distribution on macOS.

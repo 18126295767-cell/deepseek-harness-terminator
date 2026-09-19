@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>zh_CN</string>
+  <key>CFBundleDisplayName</key>
+  <string>DeepSeek Harness Terminator</string>
+  <key>CFBundleExecutable</key>
+  <string>DeepSeekHarness</string>
+  <key>CFBundleIconFile</key>
+  <string>DeepSeekHarness.icns</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.houxinran.deepseek-harness</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>DeepSeek Harness Terminator</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.1.1</string>
+  <key>CFBundleVersion</key>
+  <string>2</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>12.0</string>
+  <key>LSApplicationCategoryType</key>
+  <string>public.app-category.developer-tools</string>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>DeepSeek Harness Terminator 需要访问麦克风以进行语音输入（语音转文字）。转写在你的 Mac 上本地完成，不上传。</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>DeepSeek Harness Terminator 需要使用语音识别将你的语音转换为文字，用于向输入框语音输入。</string>
+</dict>
+</plist>

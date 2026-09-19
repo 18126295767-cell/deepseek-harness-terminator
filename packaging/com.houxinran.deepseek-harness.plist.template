@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.houxinran.deepseek-harness</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE_BIN__</string>
+    <string>__DOCTOR_SCRIPT__</string>
+    <string>--runtime</string>
+    <string>__DSH_RUNTIME__</string>
+    <string>--profile-dir</string>
+    <string>__PROFILE_DIR__</string>
+    <string>--error-marker</string>
+    <string>__ERROR_MARKER__</string>
+    <string>--exec</string>
+    <string>__NODE_BIN__</string>
+    <string>__DSH_BIN__</string>
+    <string>web</string>
+    <string>--no-open</string>
+    <string>--port</string>
+    <string>3080</string>
+  </array>
+  <key>WorkingDirectory</key>
+    <string>__WORKING_DIRECTORY__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>ProcessType</key>
+  <string>Interactive</string>
+  <key>StandardOutPath</key>
+    <string>__LOG_PATH__</string>
+  <key>StandardErrorPath</key>
+    <string>__LOG_PATH__</string>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+</dict>
+</plist>

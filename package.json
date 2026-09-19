@@ -1,0 +1,24 @@
+{
+  "name": "deepseek-harness-terminator",
+  "version": "0.1.1",
+  "description": "A local-first macOS shell and guarded Windows launcher for DeepSeek Harness, with an embedded browser and workflow-focused controls.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/18126295767-cell/deepseek-harness-terminator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/18126295767-cell/deepseek-harness-terminator/issues"
+  },
+  "homepage": "https://github.com/18126295767-cell/deepseek-harness-terminator#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "typecheck": "swiftc -typecheck -framework AppKit -framework WebKit -framework Speech -framework AVFoundation App/DeepSeekHarnessApp/main.swift App/DeepSeekHarnessApp/BuiltinBrowserAddress.swift App/DeepSeekHarnessApp/VoiceInputModel.swift App/DeepSeekHarnessApp/VoiceController.swift App/DeepSeekHarnessApp/BrowserTabManager.swift App/DeepSeekHarnessApp/BrowserSessionStore.swift App/DeepSeekHarnessApp/FindInPageModel.swift App/DeepSeekHarnessApp/CommandPalette.swift App/DeepSeekHarnessApp/PageSummaryModel.swift App/DeepSeekHarnessApp/BrowserShortcuts.swift App/DeepSeekHarnessApp/TabGroupingModel.swift App/DeepSeekHarnessApp/SplitPaneState.swift App/DeepSeekHarnessApp/SessionRestoreModel.swift App/DeepSeekHarnessApp/PageCaptureModel.swift App/DeepSeekHarnessApp/VerticalTabsModel.swift App/DeepSeekHarnessApp/UserScriptStore.swift App/DeepSeekHarnessApp/MouseGestureModel.swift",
+    "lint": "node scripts/lint.mjs"
+  }
+}

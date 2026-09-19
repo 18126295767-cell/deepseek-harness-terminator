@@ -1,0 +1,242 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Windows launcher version"
+        required: true
+        default: "0.1.1"
+  push:
+    branches:
+      - "main"
+      - "codex/windows-release-candidate"
+    tags:
+      - "windows-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows-x64:
+    runs-on: windows-2025
+    env:
+      DSH_RUNNER_LABEL: windows-2025
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+          run_install: false
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          choco install nsis --no-progress --yes
+          $candidate = @(
+            (Join-Path ${env:ProgramFiles(x86)} "NSIS\makensis.exe"),
+            (Join-Path $env:ProgramFiles "NSIS\makensis.exe")
+          ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+          if (-not $candidate) { throw "Chocolatey did not provide makensis.exe." }
+          Split-Path $candidate | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Validate PowerShell entry points
+        shell: pwsh
+        run: |
+          foreach ($file in Get-ChildItem .\windows -Filter *.ps1) {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors) { throw "PowerShell parse failed: $($file.Name)" }
+          }
+
+      - name: Test profile integrity guard
+        shell: pwsh
+        run: node --test
+
+      - name: Install screenshot runtime
+        shell: pwsh
+        run: |
+          $browserPath = Join-Path $env:RUNNER_TEMP "ms-playwright"
+          $env:PLAYWRIGHT_BROWSERS_PATH = $browserPath
+          "PLAYWRIGHT_BROWSERS_PATH=$browserPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Smoke test official DSH Web runtime
+        timeout-minutes: 8
+        shell: pwsh
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "dsh-runtime"
+          $dshHome = Join-Path $env:RUNNER_TEMP "dsh-home"
+          New-Item -ItemType Directory -Force -Path $runtime, $dshHome | Out-Null
+          Push-Location $runtime
+          try {
+            npm init -y | Out-Host
+            pnpm add --save-exact --ignore-scripts @deepseek-ai/dsh@0.1.0-rc.7 | Out-Host
+          } finally {
+            Pop-Location
+          }
+
+          $env:DSH_HOME = $dshHome
+          $launcherStdout = Join-Path $env:RUNNER_TEMP "launcher.stdout.log"
+          $launcherStderr = Join-Path $env:RUNNER_TEMP "launcher.stderr.log"
+          $windowsLogDirectory = Join-Path $env:RUNNER_TEMP "dsh-logs"
+          $env:LOCALAPPDATA = $windowsLogDirectory
+          $launcherArguments = @(
+            "-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass",
+            "-File", (Resolve-Path ".\windows\launch-dsh.ps1").Path,
+            "-DshRuntime", $runtime,
+            "-Port", "3080",
+            "-NoBrowser"
+          )
+          $launcher = Start-Process -FilePath "powershell.exe" -ArgumentList $launcherArguments `
+            -RedirectStandardOutput $launcherStdout -RedirectStandardError $launcherStderr -PassThru
+          try {
+            $response = $null
+            $deadline = [DateTime]::UtcNow.AddSeconds(90)
+            while ([DateTime]::UtcNow -lt $deadline) {
+              $launcher.Refresh()
+              if ($launcher.HasExited) { throw "Windows launcher exited before the Web UI became ready." }
+              try {
+                $response = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:3080/" -TimeoutSec 2
+                if ($response.StatusCode -eq 200) { break }
+              } catch {
+                Start-Sleep -Milliseconds 500
+              }
+            }
+            if ($null -eq $response -or $response.StatusCode -ne 200) {
+              throw "Official DSH Web runtime did not return HTTP 200 within 90 seconds."
+            }
+            if ($response.Content -notmatch 'window\.__DSH_BOOT__') {
+              throw "HTTP response is missing the DSH Web boot manifest."
+            }
+            Write-Host "Official DSH Web runtime returned HTTP 200 with a boot manifest."
+            node .\scripts\capture-windows-ui.mjs --url "http://127.0.0.1:3080/" --output .\windows-screenshots
+
+            $proof = Get-Content .\windows-screenshots\windows-screenshot-proof.json -Raw | ConvertFrom-Json
+            if ($proof.platform -ne "win32") { throw "Screenshot proof did not report Windows." }
+            if ($proof.runnerLabel -ne "windows-2025") { throw "Unexpected runner label: $($proof.runnerLabel)" }
+            if ($proof.runnerImage -notmatch '^win25') { throw "Unexpected runner image: $($proof.runnerImage)" }
+            if ($proof.screenshots.Count -ne 5) { throw "Expected five Windows screenshots." }
+            foreach ($screenshot in $proof.screenshots) {
+              if ($screenshot.width -ne 1600 -or $screenshot.height -ne 1000) {
+                throw "Unexpected dimensions for $($screenshot.file)."
+              }
+              if ($screenshot.sha256 -notmatch '^[a-f0-9]{64}$') {
+                throw "Invalid SHA-256 for $($screenshot.file)."
+              }
+            }
+          } finally {
+            $launcher.Refresh()
+            if (-not $launcher.HasExited) {
+              & taskkill.exe /PID $launcher.Id /T /F | Out-Host
+            }
+            Write-Host "--- launcher stdout ---"
+            if (Test-Path $launcherStdout) { Get-Content $launcherStdout }
+            Write-Host "--- launcher stderr ---"
+            if (Test-Path $launcherStderr) { Get-Content $launcherStderr }
+            $dshLogDirectory = Join-Path $windowsLogDirectory "DeepSeek Harness Terminator\logs"
+            if (Test-Path $dshLogDirectory) {
+              Get-ChildItem $dshLogDirectory -Filter "dsh-web-3080.*.log" | ForEach-Object {
+                Write-Host "--- $($_.Name) ---"
+                Get-Content $_.FullName
+              }
+            }
+          }
+
+      - name: Upload Windows screenshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-harness-windows-screenshots
+          path: windows-screenshots/*
+          if-no-files-found: error
+
+      - name: Build and verify release artifacts
+        id: release
+        shell: pwsh
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          TAG_VERSION: ${{ github.ref_name }}
+        run: |
+          $version = if ($env:INPUT_VERSION) { $env:INPUT_VERSION } elseif ($env:TAG_VERSION -match '^windows-v(.+)$') { $Matches[1] } else { '0.1.1' }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          & .\windows\build-release.ps1 -Version $version -OutputDirectory .\releases
+
+          $zip = ".\releases\DeepSeek-Harness-Windows-x64-v$version.zip"
+          $installer = ".\releases\DeepSeek-Harness-Setup-v$version-x64.exe"
+          $manifest = ".\releases\DeepSeek-Harness-Windows-x64-v$version.sha256"
+          foreach ($artifact in @($zip, $installer, $manifest)) {
+            if (-not (Test-Path $artifact -PathType Leaf)) { throw "Missing release artifact: $artifact" }
+          }
+
+          & 7z.exe t $zip | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "7-Zip integrity test failed for the portable archive." }
+          & 7z.exe l $installer | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "7-Zip did not recognize the NSIS installer." }
+
+          $entries = @{}
+          foreach ($line in Get-Content $manifest) {
+            if ($line -notmatch '^([a-f0-9]{64})  (.+)$') { throw "Invalid SHA-256 manifest line: $line" }
+            $entries[$Matches[2]] = $Matches[1]
+          }
+          foreach ($artifact in @($zip, $installer)) {
+            $name = [IO.Path]::GetFileName($artifact)
+            $actual = (Get-FileHash -Algorithm SHA256 $artifact).Hash.ToLowerInvariant()
+            if ($entries[$name] -ne $actual) { throw "SHA-256 mismatch for $name." }
+          }
+
+      - name: Upload workflow artifacts
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-harness-windows-x64
+          path: |
+            releases/DeepSeek-Harness-Windows-x64-v${{ steps.release.outputs.version }}.zip
+            releases/DeepSeek-Harness-Setup-v${{ steps.release.outputs.version }}-x64.exe
+            releases/DeepSeek-Harness-Windows-x64-v${{ steps.release.outputs.version }}.sha256
+          if-no-files-found: error
+
+      - name: Write verification summary
+        shell: pwsh
+        run: |
+          $version = "${{ steps.release.outputs.version }}"
+          $artifacts = @(
+            ".\releases\DeepSeek-Harness-Windows-x64-v$version.zip",
+            ".\releases\DeepSeek-Harness-Setup-v$version-x64.exe",
+            ".\releases\DeepSeek-Harness-Windows-x64-v$version.sha256"
+          )
+          @(
+            "## Windows x64 verification",
+            "",
+            "- Commit: ``${{ github.sha }}``",
+            "- Official DSH: ``@deepseek-ai/dsh@0.1.0-rc.7``",
+            "- Runtime smoke test: HTTP 200 and ``window.__DSH_BOOT__`` present",
+            "- Documentation screenshots: isolated Chromium profile on ``windows-2025``, ``1600x1000`` PNG",
+            "- Artifact digest: ``${{ steps.upload.outputs.artifact-digest }}``",
+            "",
+            "| File | Bytes | SHA-256 |",
+            "| --- | ---: | --- |"
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          foreach ($artifact in $artifacts) {
+            $item = Get-Item $artifact
+            $hash = (Get-FileHash -Algorithm SHA256 $artifact).Hash.ToLowerInvariant()
+            "| $($item.Name) | $($item.Length) | ``$hash`` |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          }
+
+      - name: Publish GitHub release for a Windows tag
+        if: startsWith(github.ref, 'refs/tags/windows-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            releases/DeepSeek-Harness-Windows-x64-v${{ steps.release.outputs.version }}.zip
+            releases/DeepSeek-Harness-Setup-v${{ steps.release.outputs.version }}-x64.exe
+            releases/DeepSeek-Harness-Windows-x64-v${{ steps.release.outputs.version }}.sha256
