@@ -163,8 +163,14 @@ Set-Location windows
 `%LOCALAPPDATA%\DeepSeek Harness Terminator\logs`，并在启动器退出时停止子 DSH 进程。无头启动可用
 `-NoBrowser`。GitHub Actions 会在 `windows-2025` runner 上调用同一个
 `windows/build-release.ps1`，并上传 ZIP、安装器、哈希文件以及一组隔离生成的
-`1600x1000` 教程截图。Windows 截图使用全新 Chromium profile，必须逐张目检后才会
-提交到教程中。
+`1600x1000` 教程截图。下方已经提交的 Windows 图片来自全新 Chromium profile，经过
+逐张目检且不含凭据：
+
+| 无凭据首次配置 | 空白工作区 |
+| --- | --- |
+| ![Windows API Key 配置，输入框为空](docs/images/windows/windows-02-api-key-onboarding.png) | ![Windows 空白工作区](docs/images/windows/windows-03-empty-workspace.png) |
+
+模型设置、插件列表和机器可读证明见[完整 Windows 中文指南](windows/README.zh-CN.md)。
 
 Windows 启动器会在监听端口前，对 `%DSH_HOME%\profiles\<profile>`（未设置时为
 `%USERPROFILE%\.dsh\profiles\<profile>`）执行同一套物理副本检查。报告会指出冲突包和

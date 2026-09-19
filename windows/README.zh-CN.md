@@ -75,16 +75,34 @@ New-Item -ItemType Directory -Force $env:DSH_HOME | Out-Null
 
 启动器会拒绝已被占用的端口，等待本机端口就绪后打开浏览器，把按端口区分的日志写入 `%LOCALAPPDATA%\DeepSeek Harness Terminator\logs`，并在启动器退出时停止子 runtime。无头启动使用 `-NoBrowser`。自定义 `-Profile` 只有在经审计的组合中包含官方 Web app 且接受 `--port` 时才有效，否则请保持默认 `web` profile。
 
-## 跨平台界面证据
+## Windows 界面步骤
 
-上游 DSH Web UI 与平台无关。仓库附带同一个空白工作区的高清参考图：
+以下图片均以 `1600x1000` 分辨率，从真实 GitHub Actions `windows-2025` x64 runner
+中的全新 Chromium profile 捕获。API Key 输入框有意留空，profile 中没有用户会话。
 
-![平台无关的 DSH Web UI 参考](../docs/images/macos-dsh-home.png)
+1. 阅读并确认上游开发者预览说明。
 
-Windows 专属的首次配置、模型和插件截图由 `.github/workflows/windows-release.yml` 在真实
-`windows-2025` runner 的全新 Chromium profile 中生成。工作流完成后，请下载
-`deepseek-harness-windows-screenshots` artifact，并用 `windows-screenshot-proof.json` 核对每张图
-都是 `1600x1000` PNG，且 SHA-256 与记录一致。不要用个人 Windows profile 或含 API key 的截图替代。
+   ![Windows 开发者预览说明](../docs/images/windows/windows-01-developer-preview.png)
+
+2. 无凭据 smoke test 请点击 **Configure later**；真正的 API Key 只应在自己的本地
+   runtime 设置中填写。
+
+   ![Windows API Key 配置，输入框为空](../docs/images/windows/windows-02-api-key-onboarding.png)
+
+3. 确认空白工作区正常显示，没有裁切或错位。
+
+   ![Windows 空白工作区](../docs/images/windows/windows-03-empty-workspace.png)
+
+4. 打开 **Settings → Models** 配置供应商；打开 **Settings → Plugins → Plugin list**
+   检查隔离 runtime 的插件。
+
+| 模型设置 | 插件列表 |
+| --- | --- |
+| ![Windows 模型设置，API Key 输入框为空](../docs/images/windows/windows-04-model-settings.png) | ![Windows 插件列表](../docs/images/windows/windows-05-plugin-inventory.png) |
+
+机器可读的来源、尺寸、文件大小和哈希记录位于
+[`windows-screenshot-proof.json`](../docs/images/windows/windows-screenshot-proof.json)。不要使用
+个人 profile 或含 API Key 的截图替代这些素材。
 
 ## 构建发布包
 

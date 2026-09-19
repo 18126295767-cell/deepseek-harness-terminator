@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -99,6 +100,26 @@ test('Windows documentation screenshots are isolated and verified', () => {
   assert.match(workflow, /runnerLabel -ne "windows-2025"/);
   assert.match(workflow, /runnerImage -notmatch '\^win25'/);
   assert.match(workflow, /1600x1000/);
+
+  const imageDirectory = path.join(root, 'docs', 'images', 'windows');
+  const proof = JSON.parse(fs.readFileSync(path.join(imageDirectory, 'windows-screenshot-proof.json'), 'utf8'));
+  assert.equal(proof.platform, 'win32');
+  assert.equal(proof.architecture, 'x64');
+  assert.equal(proof.runnerLabel, 'windows-2025');
+  assert.equal(proof.screenshots.length, 5);
+  for (const screenshot of proof.screenshots) {
+    const file = path.join(imageDirectory, screenshot.file);
+    assert.deepEqual(pngDimensions(file), { width: 1600, height: 1000 });
+    const actualHash = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+    assert.equal(actualHash, screenshot.sha256, screenshot.file);
+  }
+
+  for (const guide of ['windows/README.md', 'windows/README.zh-CN.md']) {
+    const contents = fs.readFileSync(path.join(root, guide), 'utf8');
+    assert.match(contents, /windows-02-api-key-onboarding\.png/, guide);
+    assert.match(contents, /windows-05-plugin-inventory\.png/, guide);
+    assert.match(contents, /windows-screenshot-proof\.json/, guide);
+  }
 });
 
 test('macOS documentation screenshots are lossless and linked', () => {

@@ -22,8 +22,8 @@
 ![DeepSeek Harness Terminator 原生 macOS App 首页](docs/images/macos-app-home.png)
 
 图片均为源分辨率无损 PNG，不使用二次压缩的缩略图。[截图记录](docs/images/README.md)
-列出了捕获来源、尺寸、哈希和隐私规则。Windows 图片由真实 `windows-2025` Runner 生成，
-逐张目检后才会发布。
+列出了捕获来源、尺寸、哈希和隐私规则。仓库中的 Windows 图片由真实 `windows-2025`
+x64 Runner 生成，并在逐张目检后发布。
 
 ### 高清界面导览
 
@@ -34,6 +34,9 @@
 | ![API Key 首次配置，输入框为空](assets/screenshots/macos-02-api-key-onboarding.jpg) | ![模型设置，API 密钥输入框为空](assets/screenshots/macos-04-model-settings.jpg) | ![插件列表](assets/screenshots/macos-05-plugin-inventory.jpg) |
 
 API 密钥输入框均为空。这些图片只用于文档展示，不是任何用户 profile 或会话的副本。
+
+[Windows 中文界面教程](windows/README.zh-CN.md)还包含真实 x64 环境下的无凭据首次配置、
+空白工作区、模型设置、插件列表和机器可读的截图哈希记录。
 
 ## 包含内容
 

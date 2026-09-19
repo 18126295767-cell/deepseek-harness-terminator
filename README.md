@@ -24,8 +24,9 @@ The same local runtime inside the native macOS shell:
 
 These are lossless source-resolution PNGs, not recompressed thumbnails. The
 [screenshot record](docs/images/README.md) documents capture sources,
-dimensions, checksums, and privacy rules. Windows screenshots are produced on
-a real `windows-2025` runner and are published only after visual review.
+dimensions, checksums, and privacy rules. The committed Windows screenshots
+were produced on a real `windows-2025` x64 runner and published only after
+visual review.
 
 ### UI gallery
 
@@ -37,6 +38,10 @@ The release also includes high-resolution, credential-free walkthrough frames:
 
 The API-key fields are intentionally empty. These images are documentation
 fixtures, not a copy of any user's profile or session.
+
+Real Windows x64 evidence is included in the [Windows walkthrough](windows/README.md),
+including clean onboarding, the empty workspace, model settings, plugin
+inventory, and machine-readable screenshot hashes.
 
 ## Included
 

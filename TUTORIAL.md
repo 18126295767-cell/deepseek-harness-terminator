@@ -187,8 +187,15 @@ It waits for `127.0.0.1:3080`, opens the default browser, writes logs to
 the launcher exits. Use `-NoBrowser` for headless startup. GitHub Actions uses
 the same `windows/build-release.ps1` on a `windows-2025` runner and uploads the
 ZIP, installer, hash file, and an isolated set of `1600x1000` documentation
-screenshots. Those Windows screenshots are generated from a fresh Chromium
-profile and must be visually reviewed before they are committed to this guide.
+screenshots. The committed Windows evidence below was generated from a fresh
+Chromium profile, visually reviewed, and contains no credentials:
+
+| Clean onboarding | Empty workspace |
+| --- | --- |
+| ![Windows API-key onboarding with an empty field](docs/images/windows/windows-02-api-key-onboarding.png) | ![Windows empty workspace](docs/images/windows/windows-03-empty-workspace.png) |
+
+See the [complete Windows walkthrough](windows/README.md) for model and plugin
+screenshots plus the machine-readable screenshot proof.
 
 The Windows launcher runs the same physical-copy check against
 `%DSH_HOME%\profiles\<profile>` (or `%USERPROFILE%\.dsh\profiles\<profile>`)
