@@ -7,6 +7,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const macOSTest = process.platform === 'darwin' ? test : test.skip;
 
 function pngDimensions(file) {
   const bytes = fs.readFileSync(file);
@@ -29,7 +30,7 @@ test('macOS and Windows packages include the profile doctor', () => {
   assert.equal(fs.existsSync(path.join(root, 'App', 'DeepSeekHarnessApp', 'DeepSeekHarness.app', 'Contents', 'Resources', 'profile-doctor.mjs')), true);
 });
 
-test('macOS builder accepts a deployed DSH package root', t => {
+macOSTest('macOS builder accepts a deployed DSH package root', t => {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-macos-builder-'));
   t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
 
@@ -201,7 +202,7 @@ test('built-in browser panel stays above the main window without taking focus', 
   assert.match(mainSwift, /panel\.orderFront\(nil\)/);
 });
 
-test('built-in browser address bar turns search terms into an in-panel search (TDD)', () => {
+macOSTest('built-in browser address bar turns search terms into an in-panel search (TDD)', () => {
   const source = path.join(root, 'App', 'DeepSeekHarnessApp', 'BuiltinBrowserAddress.swift');
   assert.equal(fs.existsSync(source), true, 'BuiltinBrowserAddress.swift exists');
   const mainSwift = fs.readFileSync(path.join(root, 'App', 'DeepSeekHarnessApp', 'main.swift'), 'utf8');
@@ -225,7 +226,7 @@ test('built-in browser address bar turns search terms into an in-panel search (T
   assert.match(run.stdout, /0 failures/, 'built-in address test reports 0 failures');
 });
 
-test('voice input model passes its pure-logic contract test (TDD)', () => {
+macOSTest('voice input model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'VoiceInputModel.swift');
   assert.equal(fs.existsSync(model), true, 'VoiceInputModel.swift exists');
 
@@ -255,7 +256,7 @@ test('voice input model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'voice input test reports 0 failures');
 });
 
-test('browser tab manager passes its pure-logic contract test (TDD)', () => {
+macOSTest('browser tab manager passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'BrowserTabManager.swift');
   assert.equal(fs.existsSync(model), true, 'BrowserTabManager.swift exists');
 
@@ -278,7 +279,7 @@ test('browser tab manager passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'browser tab test reports 0 failures');
 });
 
-test('browser session store passes its pure-logic contract test (TDD)', () => {
+macOSTest('browser session store passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'BrowserSessionStore.swift');
   assert.equal(fs.existsSync(model), true, 'BrowserSessionStore.swift exists');
 
@@ -297,7 +298,7 @@ test('browser session store passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'browser session test reports 0 failures');
 });
 
-test('find-in-page model passes its pure-logic contract test (TDD)', () => {
+macOSTest('find-in-page model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'FindInPageModel.swift');
   assert.equal(fs.existsSync(model), true, 'FindInPageModel.swift exists');
 
@@ -320,7 +321,7 @@ test('find-in-page model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'find-in-page test reports 0 failures');
 });
 
-test('command palette passes its pure-logic contract test (TDD)', () => {
+macOSTest('command palette passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'CommandPalette.swift');
   assert.equal(fs.existsSync(model), true, 'CommandPalette.swift exists');
 
@@ -343,7 +344,7 @@ test('command palette passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'command palette test reports 0 failures');
 });
 
-test('page-summary model passes its pure-logic contract test (TDD)', () => {
+macOSTest('page-summary model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'PageSummaryModel.swift');
   assert.equal(fs.existsSync(model), true, 'PageSummaryModel.swift exists');
 
@@ -366,7 +367,7 @@ test('page-summary model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'page summary test reports 0 failures');
 });
 
-test('browser shortcuts pass their pure-logic contract test (TDD)', () => {
+macOSTest('browser shortcuts pass their pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'BrowserShortcuts.swift');
   assert.equal(fs.existsSync(model), true, 'BrowserShortcuts.swift exists');
 
@@ -389,7 +390,7 @@ test('browser shortcuts pass their pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'browser shortcuts test reports 0 failures');
 });
 
-test('tab grouping model passes its pure-logic contract test (TDD)', () => {
+macOSTest('tab grouping model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'TabGroupingModel.swift');
   assert.equal(fs.existsSync(model), true, 'TabGroupingModel.swift exists');
 
@@ -412,7 +413,7 @@ test('tab grouping model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'tab grouping test reports 0 failures');
 });
 
-test('split pane state passes its pure-logic contract test (TDD)', () => {
+macOSTest('split pane state passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'SplitPaneState.swift');
   assert.equal(fs.existsSync(model), true, 'SplitPaneState.swift exists');
 
@@ -434,7 +435,7 @@ test('split pane state passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'split pane test reports 0 failures');
 });
 
-test('session restore model passes its pure-logic contract test (TDD)', () => {
+macOSTest('session restore model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'SessionRestoreModel.swift');
   assert.equal(fs.existsSync(model), true, 'SessionRestoreModel.swift exists');
 
@@ -461,7 +462,7 @@ test('session restore model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'session restore test reports 0 failures');
 });
 
-test('page capture model passes its pure-logic contract test (TDD)', () => {
+macOSTest('page capture model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'PageCaptureModel.swift');
   assert.equal(fs.existsSync(model), true, 'PageCaptureModel.swift exists');
 
@@ -484,7 +485,7 @@ test('page capture model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'page capture test reports 0 failures');
 });
 
-test('vertical tabs model passes its pure-logic contract test (TDD)', () => {
+macOSTest('vertical tabs model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'VerticalTabsModel.swift');
   assert.equal(fs.existsSync(model), true, 'VerticalTabsModel.swift exists');
 
@@ -507,7 +508,7 @@ test('vertical tabs model passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'vertical tabs test reports 0 failures');
 });
 
-test('user script store passes its pure-logic contract test (TDD)', () => {
+macOSTest('user script store passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'UserScriptStore.swift');
   assert.equal(fs.existsSync(model), true, 'UserScriptStore.swift exists');
 
@@ -534,7 +535,7 @@ test('user script store passes its pure-logic contract test (TDD)', () => {
   assert.match(run.stdout, /0 failures/, 'user script test reports 0 failures');
 });
 
-test('mouse gesture model passes its pure-logic contract test (TDD)', () => {
+macOSTest('mouse gesture model passes its pure-logic contract test (TDD)', () => {
   const model = path.join(root, 'App', 'DeepSeekHarnessApp', 'MouseGestureModel.swift');
   assert.equal(fs.existsSync(model), true, 'MouseGestureModel.swift exists');
 
